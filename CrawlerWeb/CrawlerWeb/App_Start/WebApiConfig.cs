@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Web.Http;
 
@@ -21,6 +19,10 @@ namespace CrawlerWeb
                 defaults: new { id = RouteParameter.Optional }
             );
 
+            //config.Formatters.Clear();
+            var jsonFormatter = new JsonMediaTypeFormatter();
+            config.Formatters.Add(jsonFormatter);
+            config.Services.Replace(typeof(IContentNegotiator), new JsonContentNegotiator(jsonFormatter));
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
         }
     }
