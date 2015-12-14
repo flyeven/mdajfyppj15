@@ -138,6 +138,7 @@
     </Compile>
     <Compile Include="Data\DTO\SearchEntryDTO.cs" />
     <Compile Include="Data\DTO\TagDTO.cs" />
+    <Compile Include="TagEqualityComparer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

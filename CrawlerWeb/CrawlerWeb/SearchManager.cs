@@ -1,4 +1,5 @@
-﻿using CrawlerWeb.Data;
+﻿using CrawlerWeb;
+using CrawlerWeb.Data;
 using CrawlerWeb.DTO;
 using Newtonsoft.Json.Linq;
 using System;
@@ -197,10 +198,28 @@ namespace CrawlerWeb
         {
             try
             {
+
+
+                var Comparer = new TagEqualityComparer();
+                var URLs = Entries.Select(e => e.URL);
                 using (var ctx = new CrawlerDataContext())
                 {
+                    var entriesInDB = (from entryDB in ctx.SearchEntries
+                                       where URLs.Contains(entryDB.URL)
+                                       select entryDB);
+
+                    if (entriesInDB.Count() > 0)
+                    {
+                        foreach (var entryInDB in entriesInDB)
+                        {
+                            SearchEntry duplicate = Entries.Single(e => e.URL.Equals(entryInDB.URL));
+                            Entries.Remove(duplicate);
+                            entryInDB.TaggedEntries = entryInDB.TaggedEntries.Union(duplicate.TaggedEntries,Comparer).ToList();
+                        }
+                    }
                     ctx.SearchEntries.AddRange(Entries);
-                    ctx.SaveChanges();
+
+                    ctx.SaveChanges();                                          
                 }
             }
             catch (Exception e)

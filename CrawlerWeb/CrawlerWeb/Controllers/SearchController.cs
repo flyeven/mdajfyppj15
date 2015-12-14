@@ -121,8 +121,9 @@ namespace CrawlerWeb.Controllers
                 }
 
                 SearchManager.AddEntries(Entries);
+                int total = Entries.Count();
                 response["status"] = true;
-                response["message"] = string.Format("{0} Entries added",Entries.Count());
+                response["message"] = string.Format("{0} new Entries added, {1} old Entries updated",Entries.Count(), total - Entries.Count());
             }
             catch (Exception e)
             {
