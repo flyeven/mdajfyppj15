@@ -35,14 +35,13 @@
       ]
     }
   ],
-  "max_links": 20,
+  "max_links": 50,
   "request_timeout": 100,
   "rules": [
-
     {
       "TagID" :  1,
-      "tag": "computer_science",
-      "terms": [
+      "TagText": "computer_science",
+      "Terms": [
         "bs(cs)",
         "bscs",
         "computer science",
@@ -52,8 +51,8 @@
     },
     {
       "TagID" :  2,
-      "tag": "bachelors",
-      "terms": [
+      "TagText": "bachelors",
+      "Terms": [
         "bba",
         "bs",
         "bachelors"
@@ -61,8 +60,8 @@
     },
     {
       "TagID" :  3,
-      "tag": "masters",
-      "terms": [
+      "TagText": "masters",
+      "Terms": [
         "mba",
         "ms",
         "mcs",
@@ -72,8 +71,8 @@
     },
     {
       "TagID" :  4,
-      "tag": "networking",
-      "terms": [
+      "TagText": "networking",
+      "Terms": [
         "networking",
         "telecommunication",
         "telecom",
@@ -83,8 +82,8 @@
     },
     {
       "TagID" :  5,
-      "tag": "management",
-      "terms": [
+      "TagText": "management",
+      "Terms": [
         "bba",
         "business",
         "economics",

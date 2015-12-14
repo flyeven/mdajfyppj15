@@ -35,21 +35,25 @@ namespace CrawlerWeb
                 using (var ctx = new CrawlerDataContext())
                 {
                     
-                    ctx.Configuration.LazyLoadingEnabled = false;
-                    var result = (from searchEntry in ctx.SearchEntries
-                                  from tag in ctx.Tags
-                                  from taggedEntry in ctx.TaggedEntries
-                                  from term in ctx.Terms
-                                  where taggedEntry.EntryID == searchEntry.EntryID
-                                  where taggedEntry.TagID == tag.TagID
-                                  where term.TagID == tag.TagID
-                                  where RefinedTerms.Any(rft => term.TermText.Contains(rft))
-                                  select searchEntry);
+                    //ctx.Configuration.LazyLoadingEnabled = false;
+                    var result = (from taggedEntry in ctx.TaggedEntries
+                                  where taggedEntry.Tag.Terms.Any(term =>
+                                        RefinedTerms.Any(rft =>
+                                            term.TermText.Contains(rft)
+                                        )                                      
+                                  )
+                                  select new
+                                  {
+                                      URL = taggedEntry.SearchEntry.URL,
+                                      Title = taggedEntry.SearchEntry.Title,
+                                      Score = taggedEntry.Score,
+                                      Tag = taggedEntry.Tag.TagText
+                                  }).OrderByDescending(s => s.Score).Skip(from).Take(size);
 
+                    
+                    //var result = (from se in ctx.SearchEntries select se);
 
-
-
-                    if (result.Count() > 0)
+                    if (result != null && result.Count() > 0)
                     {
                         foreach (var searchEntry in result)
                         {
@@ -58,13 +62,8 @@ namespace CrawlerWeb
                             //dto.Tag = taggedEntry.Tag.TagText;
                             dto.URL = searchEntry.URL;
                             dto.Title = searchEntry.Title;
-                            dto.Score = 0;
-                            dto.Tags = "";
-                            foreach (var taggedEntry in searchEntry.TaggedEntries)
-                            {
-                                dto.Score += (int)taggedEntry.Score;
-                                dto.Tags += ("[" + taggedEntry.Tag.TagText + "]");
-                            }
+                            dto.Score = (int)searchEntry.Score;
+                            dto.Tag = searchEntry.Tag;                            
 
                             resultList.Add(dto);
                         }

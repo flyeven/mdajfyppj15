@@ -47,11 +47,10 @@ namespace CrawlerCore
 
 
         public List<TaggedEntryDTO> Process(string docText)
-        {
-            
+        {            
             string refinedDocText = " "+String.Join(" ",docText.ToLower().Split(this.Splitters, StringSplitOptions.RemoveEmptyEntries))+" ";
             var rules = this.Config.Rules();
-            List<TaggedEntryDTO> taggedEntries = new List<TaggedEntryDTO>();
+            Dictionary<Int32, TaggedEntryDTO> taggedEntries = new Dictionary<Int32,TaggedEntryDTO>();
             int TagID;
             int Score = 0;
             float max = 0;
@@ -59,13 +58,13 @@ namespace CrawlerCore
             foreach (JObject rule in rules)
             {                
                 TagID = Int32.Parse(rule.GetValue("TagID").ToString());
-                Score = Process(((JArray)rule.GetValue("terms")).Select(term => (string)term).ToArray(), refinedDocText);
+                Score = Process(((JArray)rule.GetValue("Terms")).Select(term => (string)term).ToArray(), refinedDocText);
                 if (Score > 0)
                 {
-                    TaggedEntryDTO dto = new TaggedEntryDTO();
+                    TaggedEntryDTO dto = taggedEntries.ContainsKey(TagID) ? taggedEntries[TagID] : new TaggedEntryDTO(Score = 0);
                     dto.TagID = TagID;
-                    dto.Score = Score;
-                    taggedEntries.Add(dto);
+                    dto.Score += Score;
+                    taggedEntries[TagID] = dto;
                     if (Score > max)
                     {
                         max = Score;                            
@@ -73,7 +72,7 @@ namespace CrawlerCore
                 }    
             }
             
-            return taggedEntries;                        
+            return taggedEntries.Values.ToList();                        
         }
     }
 }

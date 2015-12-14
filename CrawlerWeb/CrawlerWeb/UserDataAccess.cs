@@ -27,9 +27,8 @@ namespace CrawlerWeb
                         user = result.First();
                     }
                 }
-                catch (Exception e)
-                {
-
+                catch (Exception)
+                {                    
                     return null;
                 }
             }

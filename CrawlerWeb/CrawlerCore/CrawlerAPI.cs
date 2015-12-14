@@ -39,16 +39,19 @@ namespace CrawlerCore
 
         public static Boolean WriteToFile(List<CrawlerEntryDTO> ResultList)
         {
-
+            if (ResultList == null)
+            {
+                return false;
+            }
             try
             {
                 if (!Directory.Exists("Output"))
                 {
                     Directory.CreateDirectory("Output");
                 }
-                JsonTextWriter JsonWriter = new JsonTextWriter(new StreamWriter(File.Create(@"Output\CrawlerOut.json")));
-                JsonWriter.WriteValue(ResultList);
-                JsonWriter.Close();
+                StreamWriter Writer = new StreamWriter(File.Create(@"Output\CrawlerOut.json"));
+                Writer.Write(JArray.FromObject(ResultList).ToString());
+                Writer.Close();
             }
             catch (Exception e)
             {
@@ -72,11 +75,14 @@ namespace CrawlerCore
             Console.WriteLine();
             while (this.Links.Count() > 0 && this.AnalyzedLinks.Count() < this.MaxAnalyzed)
             {
-                result.Add(AnalyzeHtml(this.Links.Dequeue()));
+                CrawlerEntryDTO subLinkResult = AnalyzeHtml(this.Links.Dequeue());
+                if (subLinkResult != null) {
+                    result.Add(subLinkResult);                
+                }
                 Console.WriteLine();
-                //Console.WriteLine("\nProgress: ["+this.AnalyzedLinks.Count()+"/"+this.MaxAnalyzed+"]\n");
+                Console.WriteLine("\nProgress: ["+this.AnalyzedLinks.Count()+"/"+this.MaxAnalyzed+"]\n");
             }
-
+            Console.WriteLine("Took: "+ DateTime.Now.Subtract(then).Seconds+" seconds");
             return result;
         }
 
@@ -227,26 +233,50 @@ namespace CrawlerCore
                 }
                 Link = Url + Link;
             }
-
+            if (!Link.EndsWith("/"))
+            {
+                Link += "/";
+            }
             return Link;
+        }
+
+
+        public static string SaveEntries(JArray jEntries)
+        {
+            HttpWebRequest Request = WebRequest.Create("http://localhost:5066/api/addentries") as HttpWebRequest;
+            Request.Method = "POST";
+            Request.ContentType = "application/json; charset=UTF-8";
+            Request.Accept = "application/json";
+            Request.KeepAlive = false;
+            Request.ProtocolVersion = HttpVersion.Version10;
+            Stream RequestStream = Request.GetRequestStream();
+            byte[] JsonBytes = Encoding.UTF8.GetBytes(jEntries.ToString());
+            
+            RequestStream.Write(JsonBytes, 0, JsonBytes.Length);
+            RequestStream.Close();
+
+            HttpWebResponse Response = (HttpWebResponse)Request.GetResponse();
+            var ResponseJSON = (JObject)new JsonSerializer().Deserialize(new JsonTextReader(new StreamReader(Response.GetResponseStream())));
+            Response.Close();
+            return ResponseJSON.ToString();
         }
 
 
         public CrawlerEntryDTO AnalyzeHtml(string url) {
             CrawlerEntryDTO crawlerResponse = new CrawlerEntryDTO();
-            long SecondsTook = 0;
-            DateTime time = DateTime.Now;
-            Console.WriteLine("URL: ["+url+"] "+" DateTime: ["+time.ToString()+"]");
+            //long SecondsTook = 0;
+            //DateTime time = DateTime.Now;
+            //Console.WriteLine("URL: ["+url+"] "+" DateTime: ["+time.ToString()+"]");
            
 
             try
             {
                 if (this.AnalyzedLinks.Contains(url))
                 {
-                    Console.WriteLine("     > Already analyzed!");
+                    //Console.WriteLine("     > Already analyzed!");
                     return null;
                 }
-                Console.WriteLine("     > Retrieving HTML...");
+                //Console.WriteLine("     > Retrieving HTML...");
                 HtmlDocument doc = this.RetrieveHtmlDoc(url);                
                 if (doc == null)
                 {
@@ -256,11 +286,11 @@ namespace CrawlerCore
                 else
                 {    
                                   
-                    if (doc.ParseErrors != null && doc.ParseErrors.Count() > 0)
+                    /*if (doc.ParseErrors != null && doc.ParseErrors.Count() > 0)
                     {
                         Console.WriteLine(string.Format("     > WARN: HTML Has ({0}) errors.", doc.ParseErrors.Count()));
-                    }
-                    Console.WriteLine("     > Analyzing..");
+                    }*/
+                    //Console.WriteLine("     > Analyzing..");
                     IEnumerable<HtmlNode> title = doc.DocumentNode.Descendants("title");
                     string titleText = "";
                     if (title.Count() > 0)
@@ -295,7 +325,7 @@ namespace CrawlerCore
                     }
 
                     crawlerResponse.TaggedEntries = processor.Process(text);
-                    Console.WriteLine("     > Analyzed successfully!");
+                    //Console.WriteLine("     > Analyzed successfully!");
                     this.AnalyzedLinks.Add(url); 
                 }
             }
@@ -304,8 +334,8 @@ namespace CrawlerCore
                 Console.WriteLine("     > WARN: ["+e.Message+"]");
                 return null;
             }
-            SecondsTook = DateTime.Now.Subtract(time).Seconds;
-            Console.WriteLine("     > Took "+SecondsTook+" s");
+            //SecondsTook = DateTime.Now.Subtract(time).Seconds;
+            //Console.WriteLine("     > Took "+SecondsTook+" s");
             return crawlerResponse;
         }
     }

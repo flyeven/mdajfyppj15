@@ -11,6 +11,6 @@ namespace CrawlerWeb.DTO
         public string Title { get; set; }
         public string URL { get; set; }
         public int Score { get; set; }
-        public string Tags { get; set; }
+        public string Tag { get; set; }
     }
 }

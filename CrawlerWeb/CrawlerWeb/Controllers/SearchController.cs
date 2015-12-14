@@ -39,7 +39,7 @@ namespace CrawlerWeb.Controllers
                 {
                     response["status"] = true;
                     response["message"] = result.Count() + " record(s) found against terms \"" + query+"\"";
-                    response["result"] = JObject.FromObject(result);
+                    response["result"] = JArray.FromObject(result);
                 }
             }
             catch (Exception e)
@@ -122,7 +122,7 @@ namespace CrawlerWeb.Controllers
 
                 SearchManager.AddEntries(Entries);
                 response["status"] = true;
-                response["message"] = string.Format("{0} Entries added",0);
+                response["message"] = string.Format("{0} Entries added",Entries.Count());
             }
             catch (Exception e)
             {
