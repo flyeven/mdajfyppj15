@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="CrawlerDataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AppSite">
+          <Key>
+            <PropertyRef Name="SiteID" />
+          </Key>
+          <Property Name="SiteID" Type="int" Nullable="false" />
+          <Property Name="Views" Type="int" />
+        </EntityType>
+        <EntityType Name="SearchEntry">
+          <Key>
+            <PropertyRef Name="EntryID" />
+          </Key>
+          <Property Name="EntryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="URL" Type="varchar" MaxLength="250" Nullable="false" />
+          <Property Name="Title" Type="varchar" MaxLength="120" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SiteUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="username" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="password" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="fullname" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="email" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Tag">
+          <Key>
+            <PropertyRef Name="TagID" />
+          </Key>
+          <Property Name="TagID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TagText" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TaggedEntry">
+          <Key>
+            <PropertyRef Name="TagID" />
+            <PropertyRef Name="EntryID" />
+          </Key>
+          <Property Name="TagID" Type="int" Nullable="false" />
+          <Property Name="EntryID" Type="int" Nullable="false" />
+          <Property Name="Score" Type="int" />
+        </EntityType>
+        <EntityType Name="Term">
+          <Key>
+            <PropertyRef Name="TermID" />
+          </Key>
+          <Property Name="TermID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TagID" Type="int" />
+          <Property Name="TermText" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <Association Name="fk_EntrySearch">
+          <End Role="SearchEntry" Type="Self.SearchEntry" Multiplicity="1" />
+          <End Role="TaggedEntry" Type="Self.TaggedEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SearchEntry">
+              <PropertyRef Name="EntryID" />
+            </Principal>
+            <Dependent Role="TaggedEntry">
+              <PropertyRef Name="EntryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_EntryTag">
+          <End Role="Tag" Type="Self.Tag" Multiplicity="1" />
+          <End Role="TaggedEntry" Type="Self.TaggedEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tag">
+              <PropertyRef Name="TagID" />
+            </Principal>
+            <Dependent Role="TaggedEntry">
+              <PropertyRef Name="TagID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_TermTag">
+          <End Role="Tag" Type="Self.Tag" Multiplicity="0..1" />
+          <End Role="Term" Type="Self.Term" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tag">
+              <PropertyRef Name="TagID" />
+            </Principal>
+            <Dependent Role="Term">
+              <PropertyRef Name="TagID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CrawlerDataModelStoreContainer">
+          <EntitySet Name="AppSite" EntityType="Self.AppSite" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SearchEntry" EntityType="Self.SearchEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SiteUser" EntityType="Self.SiteUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Tag" EntityType="Self.Tag" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TaggedEntry" EntityType="Self.TaggedEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Term" EntityType="Self.Term" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="fk_EntrySearch" Association="Self.fk_EntrySearch">
+            <End Role="SearchEntry" EntitySet="SearchEntry" />
+            <End Role="TaggedEntry" EntitySet="TaggedEntry" />
+          </AssociationSet>
+          <AssociationSet Name="fk_EntryTag" Association="Self.fk_EntryTag">
+            <End Role="Tag" EntitySet="Tag" />
+            <End Role="TaggedEntry" EntitySet="TaggedEntry" />
+          </AssociationSet>
+          <AssociationSet Name="fk_TermTag" Association="Self.fk_TermTag">
+            <End Role="Tag" EntitySet="Tag" />
+            <End Role="Term" EntitySet="Term" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CrawlerDataModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AppSite">
+          <Key>
+            <PropertyRef Name="SiteID" />
+          </Key>
+          <Property Name="SiteID" Type="Int32" Nullable="false" />
+          <Property Name="Views" Type="Int32" />
+        </EntityType>
+        <EntityType Name="SearchEntry">
+          <Key>
+            <PropertyRef Name="EntryID" />
+          </Key>
+          <Property Name="EntryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="URL" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="120" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="TaggedEntries" Relationship="Self.fk_EntrySearch" FromRole="SearchEntry" ToRole="TaggedEntry" />
+        </EntityType>
+        <EntityType Name="SiteUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="password" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="fullname" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Tag">
+          <Key>
+            <PropertyRef Name="TagID" />
+          </Key>
+          <Property Name="TagID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TagText" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="TaggedEntries" Relationship="Self.fk_EntryTag" FromRole="Tag" ToRole="TaggedEntry" />
+          <NavigationProperty Name="Terms" Relationship="Self.fk_TermTag" FromRole="Tag" ToRole="Term" />
+        </EntityType>
+        <EntityType Name="TaggedEntry">
+          <Key>
+            <PropertyRef Name="TagID" />
+            <PropertyRef Name="EntryID" />
+          </Key>
+          <Property Name="TagID" Type="Int32" Nullable="false" />
+          <Property Name="EntryID" Type="Int32" Nullable="false" />
+          <Property Name="Score" Type="Int32" />
+          <NavigationProperty Name="SearchEntry" Relationship="Self.fk_EntrySearch" FromRole="TaggedEntry" ToRole="SearchEntry" />
+          <NavigationProperty Name="Tag" Relationship="Self.fk_EntryTag" FromRole="TaggedEntry" ToRole="Tag" />
+        </EntityType>
+        <EntityType Name="Term">
+          <Key>
+            <PropertyRef Name="TermID" />
+          </Key>
+          <Property Name="TermID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TagID" Type="Int32" />
+          <Property Name="TermText" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Tag" Relationship="Self.fk_TermTag" FromRole="Term" ToRole="Tag" />
+        </EntityType>
+        <Association Name="fk_EntrySearch">
+          <End Role="SearchEntry" Type="Self.SearchEntry" Multiplicity="1" />
+          <End Role="TaggedEntry" Type="Self.TaggedEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SearchEntry">
+              <PropertyRef Name="EntryID" />
+            </Principal>
+            <Dependent Role="TaggedEntry">
+              <PropertyRef Name="EntryID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_EntryTag">
+          <End Role="Tag" Type="Self.Tag" Multiplicity="1" />
+          <End Role="TaggedEntry" Type="Self.TaggedEntry" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tag">
+              <PropertyRef Name="TagID" />
+            </Principal>
+            <Dependent Role="TaggedEntry">
+              <PropertyRef Name="TagID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_TermTag">
+          <End Role="Tag" Type="Self.Tag" Multiplicity="0..1" />
+          <End Role="Term" Type="Self.Term" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Tag">
+              <PropertyRef Name="TagID" />
+            </Principal>
+            <Dependent Role="Term">
+              <PropertyRef Name="TagID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CrawlerDataContext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AppSites" EntityType="Self.AppSite" />
+          <EntitySet Name="SearchEntries" EntityType="Self.SearchEntry" />
+          <EntitySet Name="SiteUsers" EntityType="Self.SiteUser" />
+          <EntitySet Name="Tags" EntityType="Self.Tag" />
+          <EntitySet Name="TaggedEntries" EntityType="Self.TaggedEntry" />
+          <EntitySet Name="Terms" EntityType="Self.Term" />
+          <AssociationSet Name="fk_EntrySearch" Association="Self.fk_EntrySearch">
+            <End Role="SearchEntry" EntitySet="SearchEntries" />
+            <End Role="TaggedEntry" EntitySet="TaggedEntries" />
+          </AssociationSet>
+          <AssociationSet Name="fk_EntryTag" Association="Self.fk_EntryTag">
+            <End Role="Tag" EntitySet="Tags" />
+            <End Role="TaggedEntry" EntitySet="TaggedEntries" />
+          </AssociationSet>
+          <AssociationSet Name="fk_TermTag" Association="Self.fk_TermTag">
+            <End Role="Tag" EntitySet="Tags" />
+            <End Role="Term" EntitySet="Terms" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CrawlerDataModelStoreContainer" CdmEntityContainer="CrawlerDataContext">
+          <EntitySetMapping Name="AppSites">
+            <EntityTypeMapping TypeName="CrawlerDataModel.AppSite">
+              <MappingFragment StoreEntitySet="AppSite">
+                <ScalarProperty Name="SiteID" ColumnName="SiteID" />
+                <ScalarProperty Name="Views" ColumnName="Views" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SearchEntries">
+            <EntityTypeMapping TypeName="CrawlerDataModel.SearchEntry">
+              <MappingFragment StoreEntitySet="SearchEntry">
+                <ScalarProperty Name="EntryID" ColumnName="EntryID" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SiteUsers">
+            <EntityTypeMapping TypeName="CrawlerDataModel.SiteUser">
+              <MappingFragment StoreEntitySet="SiteUser">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="fullname" ColumnName="fullname" />
+                <ScalarProperty Name="email" ColumnName="email" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tags">
+            <EntityTypeMapping TypeName="CrawlerDataModel.Tag">
+              <MappingFragment StoreEntitySet="Tag">
+                <ScalarProperty Name="TagID" ColumnName="TagID" />
+                <ScalarProperty Name="TagText" ColumnName="TagText" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TaggedEntries">
+            <EntityTypeMapping TypeName="CrawlerDataModel.TaggedEntry">
+              <MappingFragment StoreEntitySet="TaggedEntry">
+                <ScalarProperty Name="TagID" ColumnName="TagID" />
+                <ScalarProperty Name="EntryID" ColumnName="EntryID" />
+                <ScalarProperty Name="Score" ColumnName="Score" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Terms">
+            <EntityTypeMapping TypeName="CrawlerDataModel.Term">
+              <MappingFragment StoreEntitySet="Term">
+                <ScalarProperty Name="TermID" ColumnName="TermID" />
+                <ScalarProperty Name="TagID" ColumnName="TagID" />
+                <ScalarProperty Name="TermText" ColumnName="TermText" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

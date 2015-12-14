@@ -1,0 +1,96 @@
+﻿{
+  "splitters": [
+    " ",
+    ",",
+    ".",
+    "-",
+    ":",
+    ";",
+    "_"
+  ],
+  "elements": [
+    "p",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "th",
+    "td",
+    "a",
+    "li"
+
+  ],
+  "ignore_links_with": [
+    {
+      "type": "contains",
+      "terms": [
+        "news"
+      ]
+    },
+    {
+      "type": "starts_with",
+      "terms": [
+          "javascript"
+      ]
+    }
+  ],
+  "max_links": 20,
+  "request_timeout": 100,
+  "rules": [
+
+    {
+      "TagID" :  1,
+      "tag": "computer_science",
+      "terms": [
+        "bs(cs)",
+        "bscs",
+        "computer science",
+        "bs cs",
+        "bs (cs)"
+      ]
+    },
+    {
+      "TagID" :  2,
+      "tag": "bachelors",
+      "terms": [
+        "bba",
+        "bs",
+        "bachelors"
+      ]
+    },
+    {
+      "TagID" :  3,
+      "tag": "masters",
+      "terms": [
+        "mba",
+        "ms",
+        "mcs",
+        "ms computer science",
+        "ms economics"
+      ]
+    },
+    {
+      "TagID" :  4,
+      "tag": "networking",
+      "terms": [
+        "networking",
+        "telecommunication",
+        "telecom",
+        "bs telecom",
+        "bs telecommunication"
+      ]
+    },
+    {
+      "TagID" :  5,
+      "tag": "management",
+      "terms": [
+        "bba",
+        "business",
+        "economics",
+        "management science"
+      ]
+    }
+
+  ]
+}

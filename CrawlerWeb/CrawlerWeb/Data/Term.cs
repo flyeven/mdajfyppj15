@@ -7,17 +7,17 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CrawlerData
+namespace CrawlerWeb.Data
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class SiteUser
+    public partial class Term
     {
-        public int id { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
-        public string fullname { get; set; }
-        public string email { get; set; }
+        public int TermID { get; set; }
+        public Nullable<int> TagID { get; set; }
+        public string TermText { get; set; }
+    
+        public virtual Tag Tag { get; set; }
     }
 }

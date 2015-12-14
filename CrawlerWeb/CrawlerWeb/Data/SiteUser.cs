@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CrawlerWeb.Models
+namespace CrawlerWeb.Data
 {
     using System;
     using System.Collections.Generic;

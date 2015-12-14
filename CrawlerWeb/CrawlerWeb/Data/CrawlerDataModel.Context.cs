@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CrawlerWeb.Models
+namespace CrawlerWeb.Data
 {
     using System;
     using System.Data.Entity;
@@ -25,6 +25,11 @@ namespace CrawlerWeb.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<AppSite> AppSites { get; set; }
+        public virtual DbSet<SearchEntry> SearchEntries { get; set; }
         public virtual DbSet<SiteUser> SiteUsers { get; set; }
+        public virtual DbSet<Tag> Tags { get; set; }
+        public virtual DbSet<TaggedEntry> TaggedEntries { get; set; }
+        public virtual DbSet<Term> Terms { get; set; }
     }
 }
