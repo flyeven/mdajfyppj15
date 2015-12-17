@@ -7,6 +7,28 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerWeb", "CrawlerWeb\Cr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrawlerCore", "CrawlerCore\CrawlerCore.csproj", "{0536A853-5865-43E7-8DAF-ED778AC58D81}"
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "CrawlerWebUI", "C:\Users\mudasir.ali\Documents\Visual Studio 2015\WebSites\CrawlerWebUI\", "{ADF85D40-46A2-4CFB-9323-D04887310FD4}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_34856"
+		Debug.AspNetCompiler.PhysicalPath = "C:\Users\mudasir.ali\Documents\Visual Studio 2015\WebSites\CrawlerWebUI\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_34856\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_34856"
+		Release.AspNetCompiler.PhysicalPath = "C:\Users\mudasir.ali\Documents\Visual Studio 2015\WebSites\CrawlerWebUI\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_34856\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "34856"
+		SlnRelativePath = "C:\Users\mudasir.ali\Documents\Visual Studio 2015\WebSites\CrawlerWebUI\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +43,10 @@ Global
 		{0536A853-5865-43E7-8DAF-ED778AC58D81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0536A853-5865-43E7-8DAF-ED778AC58D81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0536A853-5865-43E7-8DAF-ED778AC58D81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADF85D40-46A2-4CFB-9323-D04887310FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADF85D40-46A2-4CFB-9323-D04887310FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADF85D40-46A2-4CFB-9323-D04887310FD4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADF85D40-46A2-4CFB-9323-D04887310FD4}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

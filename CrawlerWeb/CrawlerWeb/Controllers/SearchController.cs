@@ -25,6 +25,7 @@ namespace CrawlerWeb.Controllers
             [FromUri(Name = "size", SuppressPrefixCheck = false)] int size = 10)
         {
             var response = new JObject();
+            
             try
             {
                 var result = SearchManager.Search(query, from, size);
