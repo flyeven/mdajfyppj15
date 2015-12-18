@@ -17,6 +17,83 @@ namespace CrawlerWeb.Controllers
 
     public class SearchController : ApiController
     {
+
+
+
+
+        [Route("api/addtag")]
+        [HttpPost]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject AddTag(JObject jTag)
+        {
+            var response = new JObject();
+            try
+            {
+                Tag _tag = jTag.ToObject<Tag>();
+                SearchManager.AddTag(_tag);
+                response["status"] = true;
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+            return response;
+        }
+
+
+
+        [Route("api/addsite")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject AddSite([FromUri(Name = "url", SuppressPrefixCheck = false)] string url = "")
+        {
+            var response = new JObject();
+            try
+            {
+                response["status"] = false;
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    SearchManager.AddSite(url);
+                    response["status"] = true;
+                }
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+
+            return response;
+        }
+
+
+
+
+        [Route("api/deletesite")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject DeleteSiteByURL([FromUri(Name = "url", SuppressPrefixCheck = false)] string url = "")
+        {
+            var response = new JObject();
+            try
+            {
+                response["status"] = false;
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    SearchManager.DeleteSite(url);
+                    response["status"] = true;
+                }
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+
+            return response;
+        }
+
         [Route("api/search")]
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -135,36 +212,20 @@ namespace CrawlerWeb.Controllers
             return response;
         }
 
-        [Route("api/retrievetags")]
+        [Route("api/crawlerconfig")]
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
-        public JObject RetrieveTags([FromUri(Name = "query", SuppressPrefixCheck = false)] string query = "")
+        public JObject GetCrawlerConfig()
         {
             var response = new JObject();
 
             try
             {
-                List<TagDTO> result;
-                if (string.IsNullOrWhiteSpace(query))
-                {
-                    result = SearchManager.RetrieveTags();
-                }
-                else
-                {
-                    result = SearchManager.RetrieveTags(query);
-                }
-                if (result == null)
-                {
-                    response["status"] = true;
-                    response["message"] = "0 tag(s) fetched";
-                    response["tags"] = null;
-                } 
-                else
-                {
-                    response["status"] = true;
-                    response["message"] = result.Count()+" tag(s) fetched";
-                    response["tags"] = JArray.FromObject(result);
-                }
+                List<TagDTO> tags = SearchManager.RetrieveTags();
+                List<string> sites = SearchManager.GetSites();
+                response["status"] = true;
+                response["tags"] = JArray.FromObject(tags);
+                response["sites"] = JArray.FromObject(sites);              
             }
             catch (Exception e)
             {
@@ -175,5 +236,50 @@ namespace CrawlerWeb.Controllers
             return response;
         }
 
+
+        [Route("api/usercount")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject UserCount()
+        {
+            var response = new JObject();
+
+            try
+            {
+                response["status"] = false;                
+                response["count"] = SearchManager.UserCount();
+            }
+            catch (Exception e)
+            {
+                response["status"] = false;
+                response["message"] = e.Message;
+                response["count"] = null;
+            }
+            return response;
+        }
+
+        [Route("api/stats")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject Stats()
+        {
+            var response = new JObject();
+            try
+            {
+                response["status"] = true;
+                JObject stats = new JObject();
+                stats["usercount"] = SearchManager.UserCount();
+                stats["views"] = SearchManager.Views();
+                stats["entrycount"] = SearchManager.SearchEntryCount();
+                response["stats"] = stats;
+            }
+            catch (Exception e)
+            {
+                response["status"] = false;
+                response["message"] = e.Message;
+                response["stats"] = null;
+            }
+            return response;
+        }
     }
 }

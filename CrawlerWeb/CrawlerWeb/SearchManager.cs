@@ -13,9 +13,82 @@ namespace CrawlerWeb
     class SearchManager
     {
 
-        private static char[] Splitter = new char[] { ' ' };
+        private static char[] Splitter = new char[] { ' ', '+', '-', ',', '.', ':', ';', '/', '\\' };
 
         private SearchManager() { }
+
+
+        public static void AddTag(Tag tag) {
+            try
+            {
+               
+                using (var ctx = new CrawlerDataContext())
+                {
+                    ctx.Tags.Add(tag);
+                    ctx.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw new CrawlerDataError(e.Message);
+            }           
+        }
+
+        public static void DeleteSite(string url) {
+            try
+            {
+                using (var ctx = new CrawlerDataContext())
+                {
+                    var r = ctx.Sites.Where(s => s.url.Equals(url));
+                    if (r.Count() > 0)
+                    {
+                        Site s = r.First();
+                        ctx.Sites.Remove(s);
+                        ctx.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw new CrawlerDataError(e.Message);
+            }
+        }
+
+        public static void AddSite(string site) {
+            try
+            {
+                using (var ctx = new CrawlerDataContext())
+                {
+                    Site s = new Site();
+                    s.url = site;
+                    ctx.Sites.Add(s);
+
+                    ctx.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw new CrawlerDataError(e.Message);
+            }
+        }
+
+        public static List<string> GetSites()
+        {
+            try
+            {
+                using (var ctx = new CrawlerDataContext())
+                {
+                    return ctx.Sites.Select(s => s.url).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new CrawlerDataError(e.Message);
+            }
+        }
 
         public static List<SearchEntryDTO> Search(string Query, int from, int size)
         {
@@ -36,8 +109,10 @@ namespace CrawlerWeb
                 using (var ctx = new CrawlerDataContext())
                 {
                     
+                    var result = ctx.TaggedEntries.Where(t => t.Tag.Terms.Any(term => RefinedTerms.Any(rft => term.TermText.Contains(rft)))).GroupBy(g=>g.EntryID).Select(s=> new { URL=s.FirstOrDefault().SearchEntry.URL, Title=s.FirstOrDefault().SearchEntry.Title, Score = s.Sum(st=>st.Score), ID=s.FirstOrDefault().EntryID}).OrderByDescending(a=>a.Score).Skip(from).Take(size);
+
                     //ctx.Configuration.LazyLoadingEnabled = false;
-                    var result = (from taggedEntry in ctx.TaggedEntries
+                   /* var result = (from taggedEntry in ctx.TaggedEntries
                                   where taggedEntry.Tag.Terms.Any(term =>
                                         RefinedTerms.Any(rft =>
                                             term.TermText.Contains(rft)
@@ -51,21 +126,22 @@ namespace CrawlerWeb
                                       Tag = taggedEntry.Tag.TagText
                                   }).OrderByDescending(s => s.Score).Skip(from).Take(size);
 
-                    
+                    */
                     //var result = (from se in ctx.SearchEntries select se);
 
                     if (result != null && result.Count() > 0)
                     {
                         foreach (var searchEntry in result)
                         {
+
                             SearchEntryDTO dto = new SearchEntryDTO();
 
                             //dto.Tag = taggedEntry.Tag.TagText;
                             dto.URL = searchEntry.URL;
                             dto.Title = searchEntry.Title;
                             dto.Score = (int)searchEntry.Score;
-                            dto.Tag = searchEntry.Tag;                            
-
+                            dto.Tag = searchEntry.ID+","+dto.Score;                            
+                            
                             resultList.Add(dto);
                         }
                     }
@@ -89,23 +165,15 @@ namespace CrawlerWeb
             {
                 using (var ctx = new CrawlerDataContext())
                 {
-                    var result = (from tag in ctx.Tags
-                                  from term in ctx.Terms
-                                  where term.TagID == tag.TagID
-                                  select new
-                                  {
-                                      tag = tag.TagText,
-                                      TagID = tag.TagID,
-                                      terms = tag.Terms
-                                  });
+                    var result = ctx.Tags.ToList();
                     if (result.Count() > 0)
                     {
                         foreach (var tag in result)
                         {
                             TagDTO dto = new TagDTO();
                             dto.TagID = tag.TagID;
-                            dto.TagText = tag.tag;
-                            foreach (var term in tag.terms)
+                            dto.TagText = tag.TagText;
+                            foreach (var term in tag.Terms)
                             {
                                 dto.Terms.Add(term.TermText);
                             }
@@ -228,7 +296,34 @@ namespace CrawlerWeb
             }
         }
 
+        public static int SearchEntryCount() {
+            try
+            {
+                using (var ctx = new CrawlerDataContext())
+                {
+                    return ctx.SearchEntries.Count();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new CrawlerDataError(e.Message);
+            }
+        }
 
+        public static int UserCount() {
+            try
+            {
+                using (var ctx = new CrawlerDataContext())
+                {
+                    return ctx.SiteUsers.Count();
+                }
+            }
+            catch (Exception e)
+            {
+
+                throw new CrawlerDataError(e.Message);
+            }
+        }
         public static void AddViewCount()
         {
             try

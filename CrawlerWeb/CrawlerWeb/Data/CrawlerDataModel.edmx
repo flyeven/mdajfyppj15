@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="CrawlerDataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="CrawlerDataModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="AppSite">
           <Key>
             <PropertyRef Name="SiteID" />
@@ -19,6 +19,13 @@
           <Property Name="EntryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="URL" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Title" Type="varchar" MaxLength="120" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Sites">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="url" Type="varchar" MaxLength="300" />
         </EntityType>
         <EntityType Name="SiteUser">
           <Key>
@@ -55,7 +62,9 @@
           <Property Name="TermText" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <Association Name="fk_EntrySearch">
-          <End Role="SearchEntry" Type="Self.SearchEntry" Multiplicity="1" />
+          <End Role="SearchEntry" Type="Self.SearchEntry" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
           <End Role="TaggedEntry" Type="Self.TaggedEntry" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="SearchEntry">
@@ -93,6 +102,7 @@
         <EntityContainer Name="CrawlerDataModelStoreContainer">
           <EntitySet Name="AppSite" EntityType="Self.AppSite" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SearchEntry" EntityType="Self.SearchEntry" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Sites" EntityType="Self.Sites" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SiteUser" EntityType="Self.SiteUser" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tag" EntityType="Self.Tag" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TaggedEntry" EntityType="Self.TaggedEntry" Schema="dbo" store:Type="Tables" />
@@ -110,8 +120,7 @@
             <End Role="Term" EntitySet="Term" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="CrawlerDataModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -225,7 +234,15 @@
             <End Role="Tag" EntitySet="Tags" />
             <End Role="Term" EntitySet="Terms" />
           </AssociationSet>
+          <EntitySet Name="Sites" EntityType="CrawlerDataModel.Site" />
         </EntityContainer>
+        <EntityType Name="Site">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="url" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -283,6 +300,14 @@
                 <ScalarProperty Name="TermID" ColumnName="TermID" />
                 <ScalarProperty Name="TagID" ColumnName="TagID" />
                 <ScalarProperty Name="TermText" ColumnName="TermText" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Sites">
+            <EntityTypeMapping TypeName="CrawlerDataModel.Site">
+              <MappingFragment StoreEntitySet="Sites">
+                <ScalarProperty Name="url" ColumnName="url" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

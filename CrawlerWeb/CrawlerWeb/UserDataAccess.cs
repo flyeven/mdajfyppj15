@@ -37,8 +37,27 @@ namespace CrawlerWeb
         }
 
 
+        public static string Validate(SiteUser user) {
+            if (string.IsNullOrWhiteSpace(user.username))
+                return "Invalid username";
+
+            if (string.IsNullOrWhiteSpace(user.password) || user.password.Contains(' ') || user.password.Length < 6)
+                return "Password must not contains space and it must be atleast 6 characters in length";
+
+            if (string.IsNullOrWhiteSpace(user.email))
+                return "Invalid email";
+
+            if (string.IsNullOrWhiteSpace(user.fullname))
+                return "Invalid fullname";
+
+
+            return "ok";
+        }
+
         public static void CreateUser(SiteUser user)
         {
+
+           
 
             try
             {
@@ -67,7 +86,7 @@ namespace CrawlerWeb
 
         public static bool UpdateUser(SiteUser newUser)
         {
-
+           
             try
             {
                 using (var ctx = new CrawlerDataContext())

@@ -31,5 +31,6 @@ namespace CrawlerWeb.Data
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<TaggedEntry> TaggedEntries { get; set; }
         public virtual DbSet<Term> Terms { get; set; }
+        public virtual DbSet<Site> Sites { get; set; }
     }
 }

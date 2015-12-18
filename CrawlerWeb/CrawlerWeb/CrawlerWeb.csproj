@@ -138,6 +138,9 @@
     </Compile>
     <Compile Include="Data\DTO\SearchEntryDTO.cs" />
     <Compile Include="Data\DTO\TagDTO.cs" />
+    <Compile Include="Data\Site.cs">
+      <DependentUpon>CrawlerDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="TagEqualityComparer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

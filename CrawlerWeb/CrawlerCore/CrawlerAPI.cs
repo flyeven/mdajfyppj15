@@ -35,7 +35,20 @@ namespace CrawlerCore
                 this.Elements = new string[] { "p" }; 
             }
         }
-
+        public void Start()
+        {
+            JArray sites = this.Config.Sites();
+            List<CrawlerEntryDTO> result = new List<CrawlerEntryDTO>();
+            foreach (var site in sites)
+            {
+                Console.WriteLine("Analyzing "+site);
+                result.AddRange(this.AnalyzeSite(site.ToString()));
+                this.AnalyzedLinks.Clear();
+                this.Links.Clear();
+            }
+            WriteToFile(result);
+            Insert(File.Open(@"D:\CrawlerOut.json",FileMode.Open));
+        }
 
         public static Boolean WriteToFile(List<CrawlerEntryDTO> ResultList)
         {
@@ -44,13 +57,9 @@ namespace CrawlerCore
                 return false;
             }
             try
-            {
-                if (!Directory.Exists("Output"))
-                {
-                    Directory.CreateDirectory("Output");
-                }
-                StreamWriter Writer = new StreamWriter(File.Create(@"Output\CrawlerOut.json"));
-                Writer.Write(JArray.FromObject(ResultList).ToString());
+            {        
+                StreamWriter Writer = new StreamWriter(@"D:\CrawlerOut.json");
+                Writer.WriteLine(JArray.FromObject(ResultList).ToString());           
                 Writer.Close();
             }
             catch (Exception e)
@@ -59,6 +68,45 @@ namespace CrawlerCore
                 return false;
             }
             return true;
+        }
+
+
+        public static void Insert(FileStream stream)
+        {
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create("http://localhost:5066/api/addentries");
+                request.Method = "POST";
+                request.ContentType = "application/json";
+                request.Timeout = 60 * 5 * 1000;
+                request.Proxy = null;
+                request.ServicePoint.ConnectionLeaseTimeout = 60 * 5 * 1000;
+                request.ServicePoint.MaxIdleTime = 60 * 5 * 1000;
+                StreamReader reader = new StreamReader(stream);
+                string line = "";
+                StreamWriter writer = new StreamWriter(request.GetRequestStream());
+                while ((line = reader.ReadLine()) != null)
+                {
+                    writer.WriteLine(line);
+                }
+                reader.Close();
+                writer.Close();
+                WebResponse response = request.GetResponse();
+                string serverResponse = "";
+                line = "";
+                reader = new StreamReader(response.GetResponseStream());
+                while ((line = reader.ReadLine()) != null)
+                {
+                    serverResponse += line;
+                }
+                Console.WriteLine(serverResponse);
+                reader.Close();
+                response.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
         }
 
         public List<CrawlerEntryDTO> AnalyzeSite(string rootUrl)

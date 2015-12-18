@@ -36,12 +36,15 @@
     {
       "type": "starts_with",
       "terms": [
-          "javascript"
+        "javascript"
       ]
     }
   ],
-  "max_links": 100,
+  "max_links": 10,
   "request_timeout": 100,
+  "sites": [
+
+  ],
   "rules": [
     {
       "TagID" :  1,

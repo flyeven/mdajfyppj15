@@ -61,7 +61,7 @@ namespace CrawlerCore
                 Score = Process(((JArray)rule.GetValue("Terms")).Select(term => (string)term).ToArray(), refinedDocText);
                 if (Score > 0)
                 {
-                    TaggedEntryDTO dto = taggedEntries.ContainsKey(TagID) ? taggedEntries[TagID] : new TaggedEntryDTO(Score = 0);
+                    TaggedEntryDTO dto = taggedEntries.ContainsKey(TagID) ? taggedEntries[TagID] : new TaggedEntryDTO(0);
                     dto.TagID = TagID;
                     dto.Score += Score;
                     taggedEntries[TagID] = dto;
