@@ -47,7 +47,8 @@ namespace CrawlerCore
                 this.Links.Clear();
             }
             WriteToFile(result);
-            Insert(File.Open(@"D:\CrawlerOut.json",FileMode.Open));
+            Console.WriteLine("Output: "+"@CrawlerOut.json");
+            Insert(File.Open(@"C:\CrawlerOut.json",FileMode.Open));
         }
 
         public static Boolean WriteToFile(List<CrawlerEntryDTO> ResultList)
@@ -58,7 +59,7 @@ namespace CrawlerCore
             }
             try
             {        
-                StreamWriter Writer = new StreamWriter(@"D:\CrawlerOut.json");
+                StreamWriter Writer = new StreamWriter(@"C:\CrawlerOut.json");
                 Writer.WriteLine(JArray.FromObject(ResultList).ToString());           
                 Writer.Close();
             }
