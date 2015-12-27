@@ -19,13 +19,17 @@
           <Property Name="EntryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="URL" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Title" Type="varchar" MaxLength="120" Nullable="false" />
+          <Property Name="EntryTimestamp" Type="datetime" />
         </EntityType>
         <EntityType Name="Sites">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="url" Type="varchar" MaxLength="300" />
+          <Property Name="url" Type="varchar" MaxLength="300" Nullable="false" />
+          <Property Name="rank" Type="int" Nullable="false" />
+          <Property Name="country" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="250" Nullable="false" />
         </EntityType>
         <EntityType Name="SiteUser">
           <Key>
@@ -139,6 +143,7 @@
           <Property Name="URL" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Title" Type="String" MaxLength="120" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="TaggedEntries" Relationship="Self.fk_EntrySearch" FromRole="SearchEntry" ToRole="TaggedEntry" />
+          <Property Name="EntryTimestamp" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="SiteUser">
           <Key>
@@ -241,7 +246,10 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="url" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="url" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="false" />
+          <Property Name="rank" Type="Int32" Nullable="false" />
+          <Property Name="country" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -260,6 +268,7 @@
           <EntitySetMapping Name="SearchEntries">
             <EntityTypeMapping TypeName="CrawlerDataModel.SearchEntry">
               <MappingFragment StoreEntitySet="SearchEntry">
+                <ScalarProperty Name="EntryTimestamp" ColumnName="EntryTimestamp" />
                 <ScalarProperty Name="EntryID" ColumnName="EntryID" />
                 <ScalarProperty Name="URL" ColumnName="URL" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
@@ -306,6 +315,9 @@
           <EntitySetMapping Name="Sites">
             <EntityTypeMapping TypeName="CrawlerDataModel.Site">
               <MappingFragment StoreEntitySet="Sites">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="country" ColumnName="country" />
+                <ScalarProperty Name="rank" ColumnName="rank" />
                 <ScalarProperty Name="url" ColumnName="url" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>

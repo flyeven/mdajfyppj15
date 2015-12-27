@@ -57,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaggedEntryDTO.cs" />
     <Compile Include="TextProcessor.cs" />
+    <Compile Include="UniversitySiteDTO.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

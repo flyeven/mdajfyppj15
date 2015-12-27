@@ -1,12 +1,10 @@
-﻿using CrawlerWeb;
-using CrawlerWeb.Data;
+﻿using CrawlerWeb.Data;
 using CrawlerWeb.DTO;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CrawlerWeb
 {
@@ -17,6 +15,53 @@ namespace CrawlerWeb
 
         private SearchManager() { }
 
+        public static void AddUniversityRankings(List<Site> _sites)
+        {
+            using (var ctx = new CrawlerDataContext())
+            {
+                var urls = _sites.Select(s => s.url);
+                var duplicates = from site in ctx.Sites where urls.Contains(site.url) select site;
+                if(duplicates.Count() > 0)
+                {
+                    ctx.Sites.RemoveRange(duplicates.ToList());
+                    ctx.SaveChanges();                  
+                }
+
+                ctx.Sites.AddRange(_sites);
+                ctx.SaveChanges();                
+            }
+        }
+
+        public static JObject CrawlerHistogram() {
+            JObject o = new JObject();
+            JArray cat = new JArray();
+            JArray data = new JArray();
+            using (var ctx = new CrawlerDataContext())
+            {
+                var result = from entry in ctx.SearchEntries
+                             where entry.EntryTimestamp.HasValue
+                             group entry by DbFunctions.TruncateTime(entry.EntryTimestamp) into entries
+                             select new { Key = entries.Key, Count = entries.Count() };
+
+                foreach (var stat in result)
+                {
+                    
+                    cat.Add(Shorten(((DateTime) stat.Key).ToLongDateString()));
+                    data.Add(stat.Count);
+                    
+                }
+            }
+            o["categories"] = cat;
+            o["data"] = data;
+            return o;
+        }
+
+        private static String Shorten(String LongDateString)
+        {
+            String[] DateStringParts = LongDateString.Split(',');
+            String[] MonthAndDay = DateStringParts[1].Trim().Split(' ');
+            return MonthAndDay[0].Substring(0, 3) + " " + MonthAndDay[1] + ", " + DateStringParts[2].Substring(3);
+        }
 
         public static void AddTag(Tag tag) {
             try
@@ -70,8 +115,26 @@ namespace CrawlerWeb
             }
             catch (Exception e)
             {
-
                 throw new CrawlerDataError(e.Message);
+            }
+        }
+
+
+        public static List<string> GetCountries()
+        {
+            using (var ctx = new CrawlerDataContext())
+            {
+                var result = (from site in ctx.Sites select site.country).Distinct();
+                return result.ToList();
+            }
+        }
+
+        public static List<Site> GetSitesByCountry(string country)
+        {
+            using (var ctx = new CrawlerDataContext())
+            {
+                var result = (from site in ctx.Sites where country.ToLower().Equals(site.country.ToLower()) select site).OrderBy(s => s.rank);
+                return result.ToList();
             }
         }
 

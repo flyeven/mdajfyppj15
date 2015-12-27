@@ -23,6 +23,7 @@ namespace CrawlerWeb.Data
         public int EntryID { get; set; }
         public string URL { get; set; }
         public string Title { get; set; }
+        public Nullable<System.DateTime> EntryTimestamp { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaggedEntry> TaggedEntries { get; set; }

@@ -8,6 +8,7 @@ using System.Web.Http.Cors;
 using CrawlerWeb.DTO;
 using System.Collections.Generic;
 using CrawlerWeb.Data;
+using System.Data.Entity.Validation;
 
 namespace CrawlerWeb.Controllers
 {
@@ -19,7 +20,87 @@ namespace CrawlerWeb.Controllers
     {
 
 
+        [Route("api/crawlerhisto")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject GetCrawlerHistogram()
+        {
+            var response = new JObject();
+            try
+            {
+                response["data"] = SearchManager.CrawlerHistogram();
+                response["status"] = true;
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+            return response;
+        }
 
+
+        [Route("api/countries")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject Countries()
+        {
+            var response = new JObject();
+            try
+            {
+                response["data"] = JArray.FromObject(SearchManager.GetCountries());
+                response["status"] = true;
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+            return response;
+        }
+
+        [Route("api/addrankings")]
+        [HttpPost]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject AddRankings(JArray jSites)
+        {
+            var response = new JObject();
+            try
+            {
+                List<Site> _sites = jSites.ToObject<List<Site>>();
+                SearchManager.AddUniversityRankings(_sites);
+                response["status"] = true;
+            }
+            catch (DbEntityValidationException e)
+            {
+                JArray r = new JArray();
+
+                foreach (var eve in e.EntityValidationErrors)
+                {
+                    JObject o = new JObject();
+
+                    o["error"] = string.Format("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                        eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    JArray inner = new JArray();
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        inner.Add(string.Format("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage));
+                    }
+                    o["inner"] = inner;
+                    r.Add(o);
+                }
+                response["errors"] = r;
+                response["status"] = false;
+                response["message"] = e.Message;
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+            return response;
+        }
 
         [Route("api/addtag")]
         [HttpPost]
@@ -42,6 +123,30 @@ namespace CrawlerWeb.Controllers
         }
 
 
+
+        [Route("api/getsitesbycountry")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject GetSitesByCountry([FromUri(Name = "country", SuppressPrefixCheck = false)] string country = "pakistan")
+        {
+            var response = new JObject();
+            try
+            {
+                response["status"] = false;
+                if (!string.IsNullOrWhiteSpace(country))
+                {
+                    response["data"] = JArray.FromObject(SearchManager.GetSitesByCountry(country));
+                    response["status"] = true;
+                }
+            }
+            catch (Exception e)
+            {
+                response["message"] = e.Message;
+                response["status"] = false;
+            }
+
+            return response;
+        }
 
         [Route("api/addsite")]
         [HttpGet]

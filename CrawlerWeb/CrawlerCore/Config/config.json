@@ -13,6 +13,9 @@
     "\r",
     "\n"
   ],
+  "regions": [
+    "Asia/Pakistan","Asia/India","Europe/United Kingdom","Europe/Germany","North_america/United States of America"
+  ],
   "elements": [
     "p",
     "h1",

@@ -35,7 +35,60 @@ namespace CrawlerCore
                 this.Elements = new string[] { "p" }; 
             }
         }
-        public void Start()
+
+        string university_ranking_source = "http://www.webometrics.info/en/";
+        public List<List<UniversitySiteDTO>> CrawlAndUpdateSites()
+        {
+            List<List<UniversitySiteDTO>> listResult = new List<List<UniversitySiteDTO>>();
+            JArray regions = (JArray) this.Config.Get("regions");
+            foreach (var r in regions)
+            {
+                HtmlDocument doc = RetrieveHtmlDoc(university_ranking_source + r.ToString().Replace(" ","%20"));
+                if (doc != null) {
+                    Console.WriteLine("Getting ranking of universities for "+r);
+                    string country = r.ToString().Split('/')[1];
+                    var tables = doc.DocumentNode.Descendants("table").Where(d =>
+                                    d.Attributes.Contains("class") && d.Attributes["class"].Value.Contains("sticky-enabled")
+                                );
+                    if (tables.Count() == 1) {
+                        HtmlNode table = tables.First();
+                        var rows = table.Element("tbody").Descendants("tr");
+                        int rowno = 1;
+                        List<UniversitySiteDTO> ranking = new List<UniversitySiteDTO>();
+                        foreach (var row in rows)
+                        {
+                            UniversitySiteDTO dto = new UniversitySiteDTO();
+                            var columns = row.Descendants("td");
+
+                            dto.rank = Int32.Parse(columns.ElementAt(1).FirstChild.InnerText);
+                            HtmlNode nameAndURL = columns.ElementAt(2).FirstChild;
+                            dto.name = nameAndURL.InnerText;
+                            dto.url = nameAndURL.GetAttributeValue("href","#");
+                            dto.country = country;
+                            ranking.Add(dto);
+                            if (rowno > 24)
+                                break;
+
+                            rowno++;
+                        }
+                        listResult.Add(ranking);
+                    }
+                }
+            }
+
+            return listResult;
+        }
+
+        public void Insert(JArray content)
+        {
+            StreamWriter Writer = new StreamWriter(@"C:\universities.json");
+            Writer.WriteLine(content.ToString());
+            Writer.Close();
+
+            Insert(File.Open(@"C:\universities.json", FileMode.Open), "http://localhost:5066/api/addrankings");
+        } 
+
+        public void CrawlAndAnalyzeSites()
         {
             JArray sites = this.Config.Sites();
             List<CrawlerEntryDTO> result = new List<CrawlerEntryDTO>();
@@ -48,7 +101,7 @@ namespace CrawlerCore
             }
             WriteToFile(result);
             Console.WriteLine("Output: "+"@CrawlerOut.json");
-            Insert(File.Open(@"C:\CrawlerOut.json",FileMode.Open));
+            Insert(File.Open(@"C:\CrawlerOut.json",FileMode.Open), "http://localhost:5066/api/addentries");
         }
 
         public static Boolean WriteToFile(List<CrawlerEntryDTO> ResultList)
@@ -72,11 +125,11 @@ namespace CrawlerCore
         }
 
 
-        public static void Insert(FileStream stream)
+        public static void Insert(FileStream stream, string url)
         {
             try
             {
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create("http://localhost:5066/api/addentries");
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
                 request.Method = "POST";
                 request.ContentType = "application/json";
                 request.Timeout = 60 * 5 * 1000;
