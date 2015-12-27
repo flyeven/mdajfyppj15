@@ -91,17 +91,17 @@ namespace CrawlerCore
         public void CrawlAndAnalyzeSites()
         {
             JArray sites = this.Config.Sites();
-            List<CrawlerEntryDTO> result = new List<CrawlerEntryDTO>();
+            List<CrawlerEntryDTO> range = new List<CrawlerEntryDTO>();
             foreach (var site in sites)
             {
                 Console.WriteLine("Analyzing "+site);
-                result.AddRange(this.AnalyzeSite(site.ToString()));
+                range = (this.AnalyzeSite(site.ToString()));
+                WriteToFile(range);
+                //Console.WriteLine("Output: "+"@CrawlerOut.json");
+                Insert(File.Open(@"C:\CrawlerOut.json", FileMode.Open), "http://localhost:5066/api/addentries");
                 this.AnalyzedLinks.Clear();
                 this.Links.Clear();
             }
-            WriteToFile(result);
-            Console.WriteLine("Output: "+"@CrawlerOut.json");
-            Insert(File.Open(@"C:\CrawlerOut.json",FileMode.Open), "http://localhost:5066/api/addentries");
         }
 
         public static Boolean WriteToFile(List<CrawlerEntryDTO> ResultList)
