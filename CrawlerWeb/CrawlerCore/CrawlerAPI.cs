@@ -92,10 +92,11 @@ namespace CrawlerCore
         {
             JArray sites = this.Config.Sites();
             List<CrawlerEntryDTO> range = new List<CrawlerEntryDTO>();
-            foreach (var site in sites)
+            foreach (JObject site in sites)
             {
                 Console.WriteLine("Analyzing "+site);
-                range = (this.AnalyzeSite(site.ToString()));
+                string country = site.GetValue("country").ToString();
+                range = (this.AnalyzeSite(site.GetValue("url").ToString(), country));
                 WriteToFile(range);
                 //Console.WriteLine("Output: "+"@CrawlerOut.json");
                 Insert(File.Open(@"C:\CrawlerOut.json", FileMode.Open), "http://localhost:5066/api/addentries");
@@ -163,12 +164,14 @@ namespace CrawlerCore
             }
         }
 
-        public List<CrawlerEntryDTO> AnalyzeSite(string rootUrl)
+        public List<CrawlerEntryDTO> AnalyzeSite(string rootUrl, string country)
         {
             
             DateTime then = DateTime.Now;
             List<CrawlerEntryDTO> result = new List<CrawlerEntryDTO>();
             CrawlerEntryDTO rootEntry = AnalyzeHtml(rootUrl);
+            rootEntry.Country = country;
+            rootEntry.EntryTimestamp = DateTime.Now;
             if (rootEntry == null) {
                 return null;
             }
@@ -178,7 +181,10 @@ namespace CrawlerCore
             while (this.Links.Count() > 0 && this.AnalyzedLinks.Count() < this.MaxAnalyzed)
             {
                 CrawlerEntryDTO subLinkResult = AnalyzeHtml(this.Links.Dequeue());
+                
                 if (subLinkResult != null) {
+                    subLinkResult.Country = country;
+                    subLinkResult.EntryTimestamp = DateTime.Now;
                     result.Add(subLinkResult);                
                 }
                 Console.WriteLine();

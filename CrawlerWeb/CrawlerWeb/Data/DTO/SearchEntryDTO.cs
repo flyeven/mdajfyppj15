@@ -12,5 +12,7 @@ namespace CrawlerWeb.DTO
         public string URL { get; set; }
         public int Score { get; set; }
         public string Tag { get; set; }
+
+        public string Country { get; set; }
     }
 }

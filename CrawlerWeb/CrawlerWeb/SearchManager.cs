@@ -1,4 +1,5 @@
 ﻿using CrawlerWeb.Data;
+using CrawlerWeb.Data.DTO;
 using CrawlerWeb.DTO;
 using Newtonsoft.Json.Linq;
 using System;
@@ -138,13 +139,19 @@ namespace CrawlerWeb
             }
         }
 
-        public static List<string> GetSites()
+        public static List<SiteDTO> GetSites()
         {
             try
             {
                 using (var ctx = new CrawlerDataContext())
                 {
-                    return ctx.Sites.Select(s => s.url).ToList();
+                    var result = ctx.Sites.Select(s => new {  s.url, s.country} ).ToList();
+                    List<SiteDTO> _list = new List<SiteDTO>();
+                    foreach (var item in result)
+                    {
+                        _list.Add(new SiteDTO(item.country,item.url));
+                    }
+                    return _list;
                 }
             }
             catch (Exception e)
@@ -172,7 +179,22 @@ namespace CrawlerWeb
                 using (var ctx = new CrawlerDataContext())
                 {
                     
-                    var result = ctx.TaggedEntries.Where(t => t.Tag.Terms.Any(term => RefinedTerms.Any(rft => term.TermText.Contains(rft)))).GroupBy(g=>g.EntryID).Select(s=> new { URL=s.FirstOrDefault().SearchEntry.URL, Title=s.FirstOrDefault().SearchEntry.Title, Score = s.Sum(st=>st.Score), ID=s.FirstOrDefault().EntryID}).OrderByDescending(a=>a.Score).Skip(from).Take(size);
+                    var result = ctx.TaggedEntries
+                               .Where(
+                                    t => t.Tag.Terms.Any(
+                                        term => RefinedTerms.Any(
+                                            rft => term.TermText.Contains(rft))))
+                                .GroupBy(g=>g.EntryID)
+                                .Select(
+                                    s=> new {
+                                        URL = s.FirstOrDefault().SearchEntry.URL,
+                                        Title =s.FirstOrDefault().SearchEntry.Title,
+                                        Score = s.Sum(st=>st.Score),
+                                        ID =s.FirstOrDefault().EntryID}
+                                    )
+                                    .OrderByDescending( a => a.Score )
+                                    .Skip(from)
+                                    .Take(size);
 
                     //ctx.Configuration.LazyLoadingEnabled = false;
                    /* var result = (from taggedEntry in ctx.TaggedEntries
@@ -203,8 +225,8 @@ namespace CrawlerWeb
                             dto.URL = searchEntry.URL;
                             dto.Title = searchEntry.Title;
                             dto.Score = (int)searchEntry.Score;
-                            dto.Tag = searchEntry.ID+","+dto.Score;                            
-                            
+                            dto.Tag = searchEntry.ID+","+dto.Score;
+                            //dto.Country = searchEntry.country;
                             resultList.Add(dto);
                         }
                     }

@@ -12,21 +12,25 @@ namespace CrawlerWeb.Data
     using System;
     using System.Collections.Generic;
     
-    public partial class SearchEntry
+    public partial class UserDetail
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public SearchEntry()
+        public UserDetail()
         {
-            this.TaggedEntries = new HashSet<TaggedEntry>();
+            this.SiteUsers = new HashSet<SiteUser>();
         }
     
-        public int EntryID { get; set; }
-        public string URL { get; set; }
-        public string Title { get; set; }
-        public Nullable<System.DateTime> EntryTimestamp { get; set; }
+        public int Id { get; set; }
+        public int Obtained { get; set; }
+        public string Usertype { get; set; }
+        public string Academiclevel { get; set; }
+        public string Field { get; set; }
+        public string Phone { get; set; }
+        public string Addr { get; set; }
         public string Country { get; set; }
+        public string City { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<TaggedEntry> TaggedEntries { get; set; }
+        public virtual ICollection<SiteUser> SiteUsers { get; set; }
     }
 }

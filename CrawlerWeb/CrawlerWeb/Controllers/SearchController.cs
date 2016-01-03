@@ -9,6 +9,7 @@ using CrawlerWeb.DTO;
 using System.Collections.Generic;
 using CrawlerWeb.Data;
 using System.Data.Entity.Validation;
+using CrawlerWeb.Data.DTO;
 
 namespace CrawlerWeb.Controllers
 {
@@ -327,7 +328,7 @@ namespace CrawlerWeb.Controllers
             try
             {
                 List<TagDTO> tags = SearchManager.RetrieveTags();
-                List<string> sites = SearchManager.GetSites();
+                List<SiteDTO> sites = SearchManager.GetSites();
                 response["status"] = true;
                 response["tags"] = JArray.FromObject(tags);
                 response["sites"] = JArray.FromObject(sites);              

@@ -7,7 +7,6 @@
       <Diagram DiagramId="cdfff91933c0478295a90540607d8906" Name="Diagram1">
         <EntityTypeShape EntityType="CrawlerDataModel.AppSite" Width="1.5" PointX="5.75" PointY="2.125" IsExpanded="true" />
         <EntityTypeShape EntityType="CrawlerDataModel.SearchEntry" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="CrawlerDataModel.SiteUser" Width="1.5" PointX="5.75" PointY="5.125" IsExpanded="true" />
         <EntityTypeShape EntityType="CrawlerDataModel.Tag" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="CrawlerDataModel.TaggedEntry" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="CrawlerDataModel.Term" Width="1.5" PointX="3" PointY="6.5" IsExpanded="true" />
@@ -15,7 +14,10 @@
         <AssociationConnector Association="CrawlerDataModel.fk_EntryTag" ManuallyRouted="false" />
         <AssociationConnector Association="CrawlerDataModel.fk_TermTag" ManuallyRouted="false" />
         <EntityTypeShape EntityType="CrawlerDataModel.Site" Width="1.5" PointX="8.375" PointY="0.75" />
-      </Diagram>
+        <EntityTypeShape EntityType="CrawlerDataModel.SiteUser" Width="1.5" PointX="7.625" PointY="5.25" />
+        <EntityTypeShape EntityType="CrawlerDataModel.UserDetail" Width="1.5" PointX="5.375" PointY="5" />
+        <AssociationConnector Association="CrawlerDataModel.FK__SiteUser__UserDe__17036CC0" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

@@ -13,11 +13,35 @@ namespace CrawlerWeb.Controllers
 
     
 
+
+
     public class UserController : ApiController
     {
 
         //hides password before sending it in response
         bool hidePassword = true;
+
+
+        [Route("api/user")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject getUser([FromUri(Name = "uid", SuppressPrefixCheck = false)] int id = -1)
+        {
+            JObject o = new JObject();
+            try
+            {
+                o["status"] = true;                
+                o["user"] = UserDataAccess.UserToObject(UserDataAccess.GetUser(id));
+            }
+            catch (Exception e)
+            {
+                o["status"] = false;
+                o["message"] = e.Message;
+                o["user"] = null;
+               
+            }
+            return o;
+        }
 
         [Route("api/login")]
         [HttpGet]
@@ -52,7 +76,7 @@ namespace CrawlerWeb.Controllers
                         {
                             user.password = string.Concat("".PadLeft(user.password.Length, '*'), user.password.Substring(user.password.Length));
                         }
-                        response["user"] = JObject.FromObject(user);
+                        response["user"] = UserDataAccess.UserToObject(user);
                     }
                     else
                     {
@@ -102,7 +126,7 @@ namespace CrawlerWeb.Controllers
             JObject user = (JObject)jparams.GetValue("user");
             string cmd = (string) jparams.GetValue("cmd");
             SiteUser newUser = user.ToObject<SiteUser>();
-
+            
             string status = UserDataAccess.Validate(newUser);
             if (!status.Equals("ok"))
             {
@@ -117,13 +141,14 @@ namespace CrawlerWeb.Controllers
 
                 if (cmd.ToLower().Equals("create"))
                 {
-                    UserDataAccess.CreateUser(newUser);                        
+                    user["id"] = UserDataAccess.CreateUser(newUser);                        
                     response["status"] = true;
                     response["message"] = "Created";                        
                     response["user"] = user;
                 }
                 else
-                {                    
+                {
+                    newUser.password = null;
                     if (UserDataAccess.UpdateUser(newUser))
                     {
                         response["status"] = true;
@@ -148,14 +173,16 @@ namespace CrawlerWeb.Controllers
             catch (Exception e)
             {
                 response["status"] = false;
-                response["message"] = "GenericError";
+                response["message"] = e.Message;
                 response["user"] = user;
-                response["exception"] = JObject.FromObject(e);
             }
             if (hidePassword && user != null)
             {
-                string p = user.GetValue("password").ToString();
-                user["password"] = string.Concat("".PadLeft(p.Length, '*'), p.Substring(p.Length));
+                if (user.GetValue("password") != null)
+                {
+                    string p = user.GetValue("password").ToString();
+                    user["password"] = string.Concat("".PadLeft(p.Length, '*'), p.Substring(p.Length));
+                }
             }
             return response;
         }

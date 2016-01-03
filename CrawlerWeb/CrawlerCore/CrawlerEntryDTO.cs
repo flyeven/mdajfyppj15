@@ -11,5 +11,7 @@ namespace CrawlerCore
         public string Title { get; set; }
         public string URL { get; set; }
         public List<TaggedEntryDTO> TaggedEntries { get; set; }
+        public string Country { get; set; }
+        public DateTime EntryTimestamp { get; set; }
     }
 }

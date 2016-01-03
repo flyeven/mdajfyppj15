@@ -19,5 +19,8 @@ namespace CrawlerWeb.Data
         public string password { get; set; }
         public string fullname { get; set; }
         public string email { get; set; }
+        public Nullable<int> UserDetailsId { get; set; }
+    
+        public virtual UserDetail UserDetail { get; set; }
     }
 }

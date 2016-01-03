@@ -137,8 +137,15 @@
       <DependentUpon>CrawlerDataModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Data\DTO\SearchEntryDTO.cs" />
+    <Compile Include="Data\DTO\SiteDTO.cs" />
     <Compile Include="Data\DTO\TagDTO.cs" />
     <Compile Include="Data\Site.cs">
+      <DependentUpon>CrawlerDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\SiteUser.cs">
+      <DependentUpon>CrawlerDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\UserDetail.cs">
       <DependentUpon>CrawlerDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="TagEqualityComparer.cs" />
@@ -151,9 +158,6 @@
       <DependentUpon>CrawlerDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="SearchManager.cs" />
-    <Compile Include="Data\SiteUser.cs">
-      <DependentUpon>CrawlerDataModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="Data\Tag.cs">
       <DependentUpon>CrawlerDataModel.tt</DependentUpon>
     </Compile>

@@ -20,6 +20,7 @@
           <Property Name="URL" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="Title" Type="varchar" MaxLength="120" Nullable="false" />
           <Property Name="EntryTimestamp" Type="datetime" />
+          <Property Name="Country" Type="varchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="Sites">
           <Key>
@@ -40,6 +41,7 @@
           <Property Name="password" Type="nvarchar" MaxLength="30" Nullable="false" />
           <Property Name="fullname" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="email" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="UserDetailsId" Type="int" />
         </EntityType>
         <EntityType Name="Tag">
           <Key>
@@ -65,6 +67,32 @@
           <Property Name="TagID" Type="int" />
           <Property Name="TermText" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
+        <EntityType Name="UserDetails">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Obtained" Type="int" Nullable="false" />
+          <Property Name="Usertype" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Academiclevel" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Field" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Phone" Type="varchar" MaxLength="20" />
+          <Property Name="Addr" Type="varchar" MaxLength="250" />
+          <Property Name="Country" Type="varchar" MaxLength="50" />
+          <Property Name="City" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK__SiteUser__UserDe__17036CC0">
+          <End Role="UserDetails" Type="Self.UserDetails" Multiplicity="0..1" />
+          <End Role="SiteUser" Type="Self.SiteUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserDetails">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SiteUser">
+              <PropertyRef Name="UserDetailsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="fk_EntrySearch">
           <End Role="SearchEntry" Type="Self.SearchEntry" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -111,6 +139,11 @@
           <EntitySet Name="Tag" EntityType="Self.Tag" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TaggedEntry" EntityType="Self.TaggedEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Term" EntityType="Self.Term" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserDetails" EntityType="Self.UserDetails" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__SiteUser__UserDe__17036CC0" Association="Self.FK__SiteUser__UserDe__17036CC0">
+            <End Role="UserDetails" EntitySet="UserDetails" />
+            <End Role="SiteUser" EntitySet="SiteUser" />
+          </AssociationSet>
           <AssociationSet Name="fk_EntrySearch" Association="Self.fk_EntrySearch">
             <End Role="SearchEntry" EntitySet="SearchEntry" />
             <End Role="TaggedEntry" EntitySet="TaggedEntry" />
@@ -144,16 +177,7 @@
           <Property Name="Title" Type="String" MaxLength="120" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="TaggedEntries" Relationship="Self.fk_EntrySearch" FromRole="SearchEntry" ToRole="TaggedEntry" />
           <Property Name="EntryTimestamp" Type="DateTime" Precision="3" />
-        </EntityType>
-        <EntityType Name="SiteUser">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="password" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="fullname" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Country" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="Tag">
           <Key>
@@ -223,7 +247,6 @@
         <EntityContainer Name="CrawlerDataContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="AppSites" EntityType="Self.AppSite" />
           <EntitySet Name="SearchEntries" EntityType="Self.SearchEntry" />
-          <EntitySet Name="SiteUsers" EntityType="Self.SiteUser" />
           <EntitySet Name="Tags" EntityType="Self.Tag" />
           <EntitySet Name="TaggedEntries" EntityType="Self.TaggedEntry" />
           <EntitySet Name="Terms" EntityType="Self.Term" />
@@ -240,7 +263,13 @@
             <End Role="Term" EntitySet="Terms" />
           </AssociationSet>
           <EntitySet Name="Sites" EntityType="CrawlerDataModel.Site" />
-        </EntityContainer>
+          <EntitySet Name="SiteUsers" EntityType="CrawlerDataModel.SiteUser" />
+          <EntitySet Name="UserDetails" EntityType="CrawlerDataModel.UserDetail" />
+          <AssociationSet Name="FK__SiteUser__UserDe__17036CC0" Association="CrawlerDataModel.FK__SiteUser__UserDe__17036CC0">
+            <End Role="UserDetail" EntitySet="UserDetails" />
+            <End Role="SiteUser" EntitySet="SiteUsers" />
+          </AssociationSet>
+          </EntityContainer>
         <EntityType Name="Site">
           <Key>
             <PropertyRef Name="id" />
@@ -251,7 +280,46 @@
           <Property Name="country" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="false" />
         </EntityType>
-      </Schema>
+        <EntityType Name="SiteUser">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="username" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="fullname" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="UserDetailsId" Type="Int32" />
+          <NavigationProperty Name="UserDetail" Relationship="CrawlerDataModel.FK__SiteUser__UserDe__17036CC0" FromRole="SiteUser" ToRole="UserDetail" />
+        </EntityType>
+        <EntityType Name="UserDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Obtained" Type="Int32" Nullable="false" />
+          <Property Name="Usertype" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Academiclevel" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Field" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Phone" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Addr" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Country" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="SiteUsers" Relationship="CrawlerDataModel.FK__SiteUser__UserDe__17036CC0" FromRole="UserDetail" ToRole="SiteUser" />
+        </EntityType>
+        <Association Name="FK__SiteUser__UserDe__17036CC0">
+          <End Type="CrawlerDataModel.UserDetail" Role="UserDetail" Multiplicity="0..1" />
+          <End Type="CrawlerDataModel.SiteUser" Role="SiteUser" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserDetail">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SiteUser">
+              <PropertyRef Name="UserDetailsId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -268,21 +336,11 @@
           <EntitySetMapping Name="SearchEntries">
             <EntityTypeMapping TypeName="CrawlerDataModel.SearchEntry">
               <MappingFragment StoreEntitySet="SearchEntry">
+                <ScalarProperty Name="Country" ColumnName="Country" />
                 <ScalarProperty Name="EntryTimestamp" ColumnName="EntryTimestamp" />
                 <ScalarProperty Name="EntryID" ColumnName="EntryID" />
                 <ScalarProperty Name="URL" ColumnName="URL" />
                 <ScalarProperty Name="Title" ColumnName="Title" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="SiteUsers">
-            <EntityTypeMapping TypeName="CrawlerDataModel.SiteUser">
-              <MappingFragment StoreEntitySet="SiteUser">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="username" ColumnName="username" />
-                <ScalarProperty Name="password" ColumnName="password" />
-                <ScalarProperty Name="fullname" ColumnName="fullname" />
-                <ScalarProperty Name="email" ColumnName="email" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -320,6 +378,33 @@
                 <ScalarProperty Name="rank" ColumnName="rank" />
                 <ScalarProperty Name="url" ColumnName="url" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SiteUsers">
+            <EntityTypeMapping TypeName="CrawlerDataModel.SiteUser">
+              <MappingFragment StoreEntitySet="SiteUser">
+                <ScalarProperty Name="UserDetailsId" ColumnName="UserDetailsId" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="fullname" ColumnName="fullname" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserDetails">
+            <EntityTypeMapping TypeName="CrawlerDataModel.UserDetail">
+              <MappingFragment StoreEntitySet="UserDetails">
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="Country" ColumnName="Country" />
+                <ScalarProperty Name="Addr" ColumnName="Addr" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Field" ColumnName="Field" />
+                <ScalarProperty Name="Academiclevel" ColumnName="Academiclevel" />
+                <ScalarProperty Name="Usertype" ColumnName="Usertype" />
+                <ScalarProperty Name="Obtained" ColumnName="Obtained" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
