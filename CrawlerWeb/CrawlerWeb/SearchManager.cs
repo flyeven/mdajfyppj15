@@ -160,6 +160,97 @@ namespace CrawlerWeb
             }
         }
 
+
+        public static List<SearchEntryDTO> Search(string Query, List<string> country, int from, int size)
+        {
+            if (size < 10)
+            {
+                size = 10;
+            }
+            List<SearchEntryDTO> resultList = new List<SearchEntryDTO>();
+            if (String.IsNullOrWhiteSpace(Query))
+            {
+                return resultList;
+            }
+
+            string[] RefinedTerms = Query.Split(Splitter);
+
+            try
+            {
+                using (var ctx = new CrawlerDataContext())
+                {
+                   
+
+                    var result = ctx.TaggedEntries
+                               .Where(
+                                    t => (t.Tag.Terms.Any(
+                                        term => RefinedTerms.Any(
+                                            rft => term.TermText.Contains(rft))))
+                                            && 
+                                            (country.Contains(t.SearchEntry.Country.ToLower())) 
+                                           )
+                                .GroupBy(g => g.EntryID)
+                                .Select(
+                                    s => new {
+                                        URL = s.FirstOrDefault().SearchEntry.URL,
+                                        Title = s.FirstOrDefault().SearchEntry.Title,
+                                        Score = s.Sum(st => st.Score),
+                                        ID = s.FirstOrDefault().EntryID,
+                                        Country = s.FirstOrDefault().SearchEntry.Country
+                                    }
+                                    )
+                                    .OrderByDescending(a => a.Score)
+                                    .Skip(from)
+                                    .Take(size);
+
+                    //ctx.Configuration.LazyLoadingEnabled = false;
+                    /* var result = (from taggedEntry in ctx.TaggedEntries
+                                   where taggedEntry.Tag.Terms.Any(term =>
+                                         RefinedTerms.Any(rft =>
+                                             term.TermText.Contains(rft)
+                                         )                                      
+                                   )
+                                   select new
+                                   {
+                                       URL = taggedEntry.SearchEntry.URL,
+                                       Title = taggedEntry.SearchEntry.Title,
+                                       Score = taggedEntry.Score,
+                                       Tag = taggedEntry.Tag.TagText
+                                   }).OrderByDescending(s => s.Score).Skip(from).Take(size);
+
+                     */
+                    //var result = (from se in ctx.SearchEntries select se);
+
+                    if (result != null && result.Count() > 0)
+                    {
+                        foreach (var searchEntry in result)
+                        {
+
+                            SearchEntryDTO dto = new SearchEntryDTO();
+
+                            //dto.Tag = taggedEntry.Tag.TagText;
+                            dto.URL = searchEntry.URL;
+                            dto.Title = searchEntry.Title;
+                            dto.Score = (int)searchEntry.Score;
+                            dto.Tag = searchEntry.ID + "," + dto.Score;
+                            dto.Country = searchEntry.Country;
+                            //dto.Country = searchEntry.country;
+                            resultList.Add(dto);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new CrawlerDataError(e.Message);
+            }
+
+            return resultList;
+
+
+        }
+
+
         public static List<SearchEntryDTO> Search(string Query, int from, int size)
         {
             if (size < 10)
@@ -190,7 +281,9 @@ namespace CrawlerWeb
                                         URL = s.FirstOrDefault().SearchEntry.URL,
                                         Title =s.FirstOrDefault().SearchEntry.Title,
                                         Score = s.Sum(st=>st.Score),
-                                        ID =s.FirstOrDefault().EntryID}
+                                        ID =s.FirstOrDefault().EntryID,
+                                        Country = s.FirstOrDefault().SearchEntry.Country
+                                    }
                                     )
                                     .OrderByDescending( a => a.Score )
                                     .Skip(from)
@@ -226,7 +319,7 @@ namespace CrawlerWeb
                             dto.Title = searchEntry.Title;
                             dto.Score = (int)searchEntry.Score;
                             dto.Tag = searchEntry.ID+","+dto.Score;
-                            //dto.Country = searchEntry.country;
+                            dto.Country = searchEntry.Country;
                             resultList.Add(dto);
                         }
                     }

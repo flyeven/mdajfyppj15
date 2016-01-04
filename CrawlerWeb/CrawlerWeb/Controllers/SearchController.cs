@@ -204,6 +204,7 @@ namespace CrawlerWeb.Controllers
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
         public JObject search([FromUri(Name = "query", SuppressPrefixCheck = false)] string query = "",
+            [FromUri(Name = "country", SuppressPrefixCheck = false)] string country = "",
             [FromUri(Name = "from", SuppressPrefixCheck = false)] int from = 0,
             [FromUri(Name = "size", SuppressPrefixCheck = false)] int size = 10)
         {
@@ -211,7 +212,25 @@ namespace CrawlerWeb.Controllers
             
             try
             {
-                var result = SearchManager.Search(query, from, size);
+
+                List<SearchEntryDTO> result = null;
+                if (string.IsNullOrWhiteSpace(country))
+                {
+                    result = SearchManager.Search(query, from, size);
+                }
+                else
+                {
+                    List<string> countries = new List<string>();
+                    if (country.Contains(','))
+                    {
+                        countries = country.Split(',').Select(i => i.Trim().ToLower()).ToList();
+                    }
+                    else
+                    {
+                        countries.Add(country.Trim().ToLower());
+                    }
+                    result = SearchManager.Search(query, countries, from, size);
+                }
 
                 if (result == null || result.Count() == 0)
                 {

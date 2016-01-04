@@ -170,11 +170,11 @@ namespace CrawlerCore
             DateTime then = DateTime.Now;
             List<CrawlerEntryDTO> result = new List<CrawlerEntryDTO>();
             CrawlerEntryDTO rootEntry = AnalyzeHtml(rootUrl);
-            rootEntry.Country = country;
-            rootEntry.EntryTimestamp = DateTime.Now;
             if (rootEntry == null) {
                 return null;
             }
+            rootEntry.Country = country;
+            rootEntry.EntryTimestamp = DateTime.Now;
             result.Add(rootEntry);
             //this.Links.Enqueue(rootUrl);
             Console.WriteLine();

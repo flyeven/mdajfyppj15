@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 
 namespace CrawlerCore
 {
@@ -35,9 +36,11 @@ namespace CrawlerCore
             {
                 api.CrawlAndAnalyzeSites();
             }
-            
+            //Thread.Sleep(3000);
             //CrawlerAPI.Insert(File.Open(@"D:\CrawlerOut.json",FileMode.Open));
-            Console.ReadLine();
+            Console.Write("Enter to exit: ");
+            var a = Console.ReadLine();
+            Environment.Exit(0);
         }
     }
 }
