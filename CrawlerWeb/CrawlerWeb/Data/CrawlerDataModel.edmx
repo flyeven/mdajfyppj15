@@ -12,6 +12,15 @@
           <Property Name="SiteID" Type="int" Nullable="false" />
           <Property Name="Views" Type="int" />
         </EntityType>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="50" />
+          <Property Name="text" Type="varchar" MaxLength="500" />
+          <Property Name="cur_time" Type="datetime" Nullable="false" />
+        </EntityType>
         <EntityType Name="SearchEntry">
           <Key>
             <PropertyRef Name="EntryID" />
@@ -134,6 +143,7 @@
         </Association>
         <EntityContainer Name="CrawlerDataModelStoreContainer">
           <EntitySet Name="AppSite" EntityType="Self.AppSite" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Comment" EntityType="Self.Comment" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SearchEntry" EntityType="Self.SearchEntry" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sites" EntityType="Self.Sites" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SiteUser" EntityType="Self.SiteUser" Schema="dbo" store:Type="Tables" />
@@ -270,6 +280,7 @@
             <End Role="UserDetail" EntitySet="UserDetails" />
             <End Role="SiteUser" EntitySet="SiteUsers" />
           </AssociationSet>
+          <EntitySet Name="Comments" EntityType="CrawlerDataModel.Comment" />
           </EntityContainer>
         <EntityType Name="Site">
           <Key>
@@ -321,6 +332,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Comment">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="text" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="cur_time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -408,6 +428,16 @@
                 <ScalarProperty Name="Usertype" ColumnName="Usertype" />
                 <ScalarProperty Name="Obtained" ColumnName="Obtained" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Comments">
+            <EntityTypeMapping TypeName="CrawlerDataModel.Comment">
+              <MappingFragment StoreEntitySet="Comment">
+                <ScalarProperty Name="cur_time" ColumnName="cur_time" />
+                <ScalarProperty Name="text" ColumnName="text" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

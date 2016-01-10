@@ -17,6 +17,7 @@
         <EntityTypeShape EntityType="CrawlerDataModel.SiteUser" Width="1.5" PointX="7.625" PointY="5.25" />
         <EntityTypeShape EntityType="CrawlerDataModel.UserDetail" Width="1.5" PointX="5.375" PointY="5" />
         <AssociationConnector Association="CrawlerDataModel.FK__SiteUser__UserDe__17036CC0" />
+        <EntityTypeShape EntityType="CrawlerDataModel.Comment" Width="1.5" PointX="5.375" PointY="8.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

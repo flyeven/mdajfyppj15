@@ -33,5 +33,6 @@ namespace CrawlerWeb.Data
         public virtual DbSet<Site> Sites { get; set; }
         public virtual DbSet<SiteUser> SiteUsers { get; set; }
         public virtual DbSet<UserDetail> UserDetails { get; set; }
+        public virtual DbSet<Comment> Comments { get; set; }
     }
 }

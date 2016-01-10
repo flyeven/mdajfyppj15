@@ -122,6 +122,9 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="CrawlerDataError.cs" />
+    <Compile Include="Data\Comment.cs">
+      <DependentUpon>CrawlerDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\CrawlerDataModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

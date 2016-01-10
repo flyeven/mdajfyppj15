@@ -336,6 +336,24 @@ namespace CrawlerWeb
         }
 
 
+        public static void AddComment(Comment c) {
+            using (var ctx = new CrawlerDataContext())
+            {
+                
+                ctx.Comments.Add(c);
+                ctx.SaveChanges();
+            }
+        }
+
+
+        public static List<Comment> RetrieveComments()
+        {
+            using (var ctx = new CrawlerDataContext())
+            {
+                return ctx.Comments.ToList();
+            }
+        }
+
         public static List<TagDTO> RetrieveTags()
         {
             List<TagDTO> resultList = new List<TagDTO>();

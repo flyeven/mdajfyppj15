@@ -21,6 +21,58 @@ namespace CrawlerWeb.Controllers
     {
 
 
+
+
+        [Route("api/getcomments")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject GetComments()
+        {
+            JObject response = new JObject();
+            response["status"] = true;
+
+            try
+            {
+                response["comments"] = JArray.FromObject(SearchManager.RetrieveComments());
+            }
+            catch (Exception e)
+            {
+                response["comments"] = null;
+                response["status"] = false;
+            }
+
+            return response;
+        }
+
+        [Route("api/addcomment")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject AddComment([FromUri(Name = "name", SuppressPrefixCheck = false)] string _name = "Unknown",
+            [FromUri(Name = "text", SuppressPrefixCheck = false)] string _text = "")
+        {
+            JObject response = new JObject();
+            response["status"] = true;
+            if (!string.IsNullOrWhiteSpace(_text))
+            {
+
+                try
+                {
+                    SearchManager.AddComment(new Comment() { name = _name, text = _text, cur_time = DateTime.Now });
+                }
+                catch (Exception e)
+                {
+
+                    response["status"] = false;
+                    response["message"] = e.Message;
+                }
+            }
+            else {
+                response["status"] = false;    
+            }
+
+            return response;
+        }
+
         [Route("api/crawlerhisto")]
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
