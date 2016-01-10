@@ -114,6 +114,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Crypto.cs" />
     <Compile Include="Data\AppSite.cs">
       <DependentUpon>CrawlerDataModel.tt</DependentUpon>
     </Compile>

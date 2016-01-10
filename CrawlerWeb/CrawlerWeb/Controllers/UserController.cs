@@ -43,6 +43,53 @@ namespace CrawlerWeb.Controllers
             return o;
         }
 
+
+        [Route("api/verify")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject VerifyEmail([FromUri(Name = "code", SuppressPrefixCheck = false)] string code = "",
+            [FromUri(Name = "username", SuppressPrefixCheck = false)] string username = "")
+        {
+            JObject response = new JObject();
+            ;
+            try
+            {
+                bool isVerified = UserDataAccess.Verify(code, username);
+                response["verified"] = isVerified;
+                response["message"] = isVerified ? "User email verified" : "User email could not be verified";
+            }
+            catch (Exception e)
+            {
+                response["verified"] = false;
+                response["message"] = e.Message;
+            }
+
+            return response;
+        }
+
+        [Route("api/verificationemail")]
+        [HttpGet]
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public JObject SendVerificationEmail([FromUri(Name = "username", SuppressPrefixCheck = false)] string username = "")
+        {
+            JObject response = new JObject();
+            ;
+            try
+            {
+                UserDataAccess.SendVerificationLink(username);
+                response["status"] = true;
+                //response["message"] = isVerified ? "User email verified" : "User email could not be verified";
+            }
+            catch (Exception e)
+            {
+                response["status"] = false;
+                response["message"] = e.Message;
+            }
+
+            return response;
+        }
+
+
         [Route("api/login")]
         [HttpGet]
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -67,22 +114,30 @@ namespace CrawlerWeb.Controllers
                 user = UserDataAccess.GetUserByUsername(username); 
                 if (user != null)
                 {
-
-                    if (user.password.Equals(password))
+                    if (user.Verification != null && user.Verification.StartsWith("KEY"))
                     {
-                        response["authenticated"] = true;
-                        response["message"] = string.Format("User {0} was authenticated successfully", user.username);
-                        if (hidePassword)
-                        {
-                            user.password = string.Concat("".PadLeft(user.password.Length, '*'), user.password.Substring(user.password.Length));
-                        }
-                        response["user"] = UserDataAccess.UserToObject(user);
+                        response["authenticated"] = false;
+                        response["message"] = "The user was authenticated successfully, but has not been verified throguh the email, kindly verify your account. Click <a href=\"Javascript:Ajax('"+UserDataAccess.Host()+"api/verificationemail?username="+user.username+"');\">here</a> to send verification link again";
+                        response["user"] = null;
                     }
                     else
                     {
-                        response["authenticated"] = false;
-                        response["message"] = string.Format("Could not authenticate user with username {0}", user.username);
-                        response["user"] = null;
+                        if (user.password.Equals(password))
+                        {
+                            response["authenticated"] = true;
+                            response["message"] = string.Format("User {0} was authenticated successfully", user.username);
+                            if (hidePassword)
+                            {
+                                user.password = string.Concat("".PadLeft(user.password.Length, '*'), user.password.Substring(user.password.Length));
+                            }
+                            response["user"] = UserDataAccess.UserToObject(user);
+                        }
+                        else
+                        {
+                            response["authenticated"] = false;
+                            response["message"] = string.Format("Could not authenticate user with username {0}", user.username);
+                            response["user"] = null;
+                        }
                     }
                 }
                 else
@@ -93,8 +148,7 @@ namespace CrawlerWeb.Controllers
                 }
             }
             catch (Exception e)
-            {
-                
+            {                
                 response["authenticated"] = false;
                 response["message"] = "Error occured while authenticating user";
                 response["errorDetails"] = JObject.FromObject(e);

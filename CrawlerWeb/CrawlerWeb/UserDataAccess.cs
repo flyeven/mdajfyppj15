@@ -6,15 +6,43 @@ using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Mail;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace CrawlerWeb
 {
+
     public class UserDataAccess
     {
         private UserDataAccess() { }
 
+        public static void Main(string[] args)
+        {
+
+        }
+
+        public static string SendEmail(string Subject, string Body, string to)
+        {
+            try
+            {
+                MailMessage mail = new MailMessage("student_portal_team@outlook.com", to);
+                SmtpClient client = new SmtpClient();
+
+                mail.Subject = Subject;
+                mail.Body = Body;
+                mail.IsBodyHtml = true;
+
+                client.Send(mail);
+                return "SENT";
+            }
+            catch (Exception e)
+            {
+                return "ERROR: "+e.Message;
+            }
+        }
 
         public static SiteUser GetUser(int id) {
             using (var ctx = new CrawlerDataContext())
@@ -31,6 +59,8 @@ namespace CrawlerWeb
 
         public static SiteUser GetUserByUsername(string username)
         {
+
+            
             SiteUser user = null;
             using (var ctx = new CrawlerDataContext())
             {
@@ -53,6 +83,61 @@ namespace CrawlerWeb
             return user;
         }
 
+        public static void SendVerificationLink(string username)
+        {
+            SiteUser user = GetUserByUsername(username);
+            if(user.Verification != null && user.Verification.StartsWith("KEY"))
+            {               
+                SendEmail("Verify Career Portal", VerificationEmailBody(user.username, user.Verification), user.email);
+            }
+        }
+
+        public static string GetVerificationLink(string username, string key)
+        {
+            string url = Host();
+            url += "api/verify?username="+Uri.EscapeDataString(username)+"&code=" + Uri.EscapeDataString(Crypto.Encrypt(username,key));
+            return url;
+        }
+
+        public static string Host()
+        {
+            string url = HttpContext.Current.Request.Url.ToString();
+            if (!url.EndsWith("/"))
+            {
+                url += "/";
+            }
+
+            url = url.Replace("//", ";;");
+            url = url.Split('/')[0].Replace(";;", "//") + "/";
+            return url;
+        }
+
+
+
+
+        public static bool Verify(string code, string username)
+        {
+            using (var ctx = new CrawlerDataContext())
+            {
+                SiteUser user = null;
+                var result = (from u in ctx.SiteUsers
+                              where u.username.Equals(username)
+                              select u);
+                if (result.Count() > 0)
+                {
+                    user = result.First();
+                    var load = user.UserDetail;
+                    string decrypted = Crypto.Decrypt(code, user.Verification);
+                    if (username.Equals(decrypted))
+                    {
+                        user.Verification = "VERIFIED";
+                        ctx.SaveChanges();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         public static string Validate(SiteUser user) {
             if (string.IsNullOrWhiteSpace(user.username))
@@ -71,6 +156,17 @@ namespace CrawlerWeb
             return "ok";
         }
 
+        public static String VerificationEmailBody(string username,string key) {
+            return "Dear <strong>" + username + "</strong>, thank you for using our Career/Student portal. You need to verify yourself using this email address, kindly follow this link in your browser to activate your account : <a href=\"" + GetVerificationLink(username, key) + "\">Verify</a>. Thanks you!"; 
+        }
+
+        public static String GetKey()
+        {
+            return "KEY"+new Random().Next(0, 1000000).ToString("D6");
+        }
+
+
+
         public static int CreateUser(SiteUser user)
         {
 
@@ -81,8 +177,11 @@ namespace CrawlerWeb
                 
                 using (var ctx = new CrawlerDataContext())
                 {
+                    
+                    user.Verification = GetKey();
                     SiteUser newUser = ctx.SiteUsers.Add(user);
                     ctx.SaveChanges();
+                    SendEmail("Welcome! "+ newUser.fullname, VerificationEmailBody(newUser.username, newUser.Verification), newUser.email);
                     return newUser.id;
                 }
             }
